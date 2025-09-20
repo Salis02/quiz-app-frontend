@@ -8,7 +8,7 @@ function Card({
   const hoverEffect = hover ? 'hover:shadow-lg hover:scale-[1.02] transition-all duration-200' : ''
   
   return (
-    <div className={`bg-white rounded-lg border ${shadow} ${padding} ${hoverEffect} ${className}`}>
+    <div className={`bg-white rounded-xl border border-gray-200 ${shadow} ${padding} ${hoverEffect} ${className}`}>
       {children}
     </div>
   )

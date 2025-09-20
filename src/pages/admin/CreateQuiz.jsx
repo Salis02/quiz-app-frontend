@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { 
-  ArrowLeft, 
-  Save, 
+import {
+  ArrowLeft,
+  Save,
   Plus,
   Trash2,
   Edit,
@@ -19,7 +19,7 @@ import toast from 'react-hot-toast'
 
 function CreateQuiz() {
   const navigate = useNavigate()
-  
+
   const [loading, setLoading] = useState(false)
   const [categories, setCategories] = useState([])
   const [questions, setQuestions] = useState([])
@@ -78,18 +78,18 @@ function CreateQuiz() {
   const saveBasicInfo = async (formData) => {
     try {
       setLoading(true)
-      
+
       // Convert category_id to number if provided
       const quizData = {
         ...formData,
         category_id: formData.category_id ? parseInt(formData.category_id) : null
       }
-      
+
       const response = await adminService.createQuiz(quizData)
       setSavedQuizId(response.data.id)
       setCurrentStep(2)
       toast.success('Quiz created! Now add some questions.')
-      
+
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to create quiz'
       toast.error(message)
@@ -114,45 +114,45 @@ function CreateQuiz() {
 
   // Update question
   const updateQuestion = (questionId, field, value) => {
-    setQuestions(questions.map(q => 
+    setQuestions(questions.map(q =>
       q.id === questionId ? { ...q, [field]: value } : q
     ))
   }
 
   // Add option to question
   const addOption = (questionId) => {
-    setQuestions(questions.map(q => 
-      q.id === questionId 
-        ? { 
-            ...q, 
-            options: [...q.options, { 
-              id: Date.now(), 
-              text: '', 
-              is_correct: false 
-            }] 
-          }
+    setQuestions(questions.map(q =>
+      q.id === questionId
+        ? {
+          ...q,
+          options: [...q.options, {
+            id: Date.now(),
+            text: '',
+            is_correct: false
+          }]
+        }
         : q
     ))
   }
 
   // Update option
   const updateOption = (questionId, optionId, field, value) => {
-    setQuestions(questions.map(q => 
-      q.id === questionId 
+    setQuestions(questions.map(q =>
+      q.id === questionId
         ? {
-            ...q,
-            options: q.options.map(opt => 
-              opt.id === optionId ? { ...opt, [field]: value } : opt
-            )
-          }
+          ...q,
+          options: q.options.map(opt =>
+            opt.id === optionId ? { ...opt, [field]: value } : opt
+          )
+        }
         : q
     ))
   }
 
   // Remove option
   const removeOption = (questionId, optionId) => {
-    setQuestions(questions.map(q => 
-      q.id === questionId 
+    setQuestions(questions.map(q =>
+      q.id === questionId
         ? { ...q, options: q.options.filter(opt => opt.id !== optionId) }
         : q
     ))
@@ -165,15 +165,15 @@ function CreateQuiz() {
 
   // Set correct answer (only one for MCQ)
   const setCorrectAnswer = (questionId, optionId) => {
-    setQuestions(questions.map(q => 
-      q.id === questionId 
+    setQuestions(questions.map(q =>
+      q.id === questionId
         ? {
-            ...q,
-            options: q.options.map(opt => ({
-              ...opt,
-              is_correct: opt.id === optionId
-            }))
-          }
+          ...q,
+          options: q.options.map(opt => ({
+            ...opt,
+            is_correct: opt.id === optionId
+          }))
+        }
         : q
     ))
   }
@@ -260,8 +260,8 @@ function CreateQuiz() {
           <div key={step} className="flex items-center">
             <div className={`
               w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium
-              ${currentStep >= step 
-                ? 'bg-primary-500 text-white' 
+              ${currentStep >= step
+                ? 'bg-blue-500 text-white'
                 : 'bg-gray-200 text-gray-500'
               }
             `}>
@@ -283,7 +283,7 @@ function CreateQuiz() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
@@ -314,7 +314,7 @@ function CreateQuiz() {
             <h2 className="text-xl font-semibold text-gray-900 mb-6">
               Basic Information
             </h2>
-            
+
             <form onSubmit={handleSubmit(saveBasicInfo)} className="space-y-6">
               <Input
                 label="Quiz Title"
@@ -327,42 +327,26 @@ function CreateQuiz() {
                 required
               />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
-                <textarea
-                  name="description"
-                  placeholder="Describe what this quiz is about..."
-                  value={values.description}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  rows={4}
-                  className={`input-field ${getFieldError('description') ? 'border-red-300' : ''}`}
-                />
-                {getFieldError('description') && (
-                  <p className="mt-1 text-sm text-red-600">{getFieldError('description')}</p>
-                )}
-              </div>
+              <Input
+                as="textarea"
+                label="Description"
+                name="description"
+                placeholder="Describe what this quiz is about..."
+                value={values.description}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={getFieldError('description')}
+                rows={4}
+              />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category (Optional)
-                </label>
-                <select
-                  name="category_id"
-                  value={values.category_id}
-                  onChange={handleChange}
-                  className="input-field"
-                >
-                  <option value="">Select a category</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Input
+                as="select"
+                label="Category (Optional)"
+                name="category_id"
+                value={values.category_id}
+                onChange={handleChange}
+                options={categories.map(c => ({ value: c.id, label: c.name }))}
+              />
 
               <div className="flex justify-end">
                 <Button
@@ -432,19 +416,16 @@ function CreateQuiz() {
                     </div>
 
                     <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Question Text
-                        </label>
-                        <textarea
-                          placeholder="Enter your question..."
-                          value={question.text}
-                          onChange={(e) => updateQuestion(question.id, 'text', e.target.value)}
-                          rows={3}
-                          className="input-field"
-                        />
-                      </div>
-
+                      <Input
+                        as="textarea"
+                        label="Question Text"
+                        placeholder="Enter your question..."
+                        value={question.text}
+                        rows={3}
+                        onChange={(e) =>
+                          updateQuestion(question.id, 'text', e.target.value)
+                        }
+                      />
                       <div>
                         <div className="flex items-center justify-between mb-3">
                           <label className="text-sm font-medium text-gray-700">
@@ -470,12 +451,18 @@ function CreateQuiz() {
                                 onChange={() => setCorrectAnswer(question.id, option.id)}
                                 className="w-4 h-4 text-primary-600"
                               />
-                              <input
-                                type="text"
+                              <Input
                                 placeholder={`Option ${optionIndex + 1}`}
                                 value={option.text}
-                                onChange={(e) => updateOption(question.id, option.id, 'text', e.target.value)}
-                                className="flex-1 input-field"
+                                onChange={(e) =>
+                                  updateOption(
+                                    question.id,
+                                    option.id,
+                                    'text',
+                                    e.target.value
+                                  )
+                                }
+                                className="flex-1"
                               />
                               {question.options.length > 2 && (
                                 <Button
@@ -524,7 +511,7 @@ function CreateQuiz() {
             <h2 className="text-xl font-semibold text-gray-900 mb-6">
               Review & Publish
             </h2>
-            
+
             <div className="space-y-6">
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <div className="flex items-center">
@@ -534,7 +521,7 @@ function CreateQuiz() {
                   </h3>
                 </div>
                 <p className="text-sm text-green-700 mt-1">
-                  Your quiz has been saved with {questions.length} questions. 
+                  Your quiz has been saved with {questions.length} questions.
                   You can now publish it to make it available to users.
                 </p>
               </div>

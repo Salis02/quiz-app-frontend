@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Eye, 
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
   BarChart3,
   Search,
   Filter,
@@ -25,7 +25,7 @@ import toast from 'react-hot-toast'
 
 function ManageQuizzes() {
   const navigate = useNavigate()
-  
+
   const [loading, setLoading] = useState(true)
   const [quizzes, setQuizzes] = useState([])
   const [filteredQuizzes, setFilteredQuizzes] = useState([])
@@ -45,15 +45,15 @@ function ManageQuizzes() {
   const loadData = async () => {
     try {
       setLoading(true)
-      
+
       const [quizzesResponse, categoriesResponse] = await Promise.all([
         adminService.getAllQuizzes(),
         adminService.getCategories()
       ])
-      
+
       setQuizzes(quizzesResponse.data)
       setCategories(categoriesResponse.data)
-      
+
     } catch (error) {
       toast.error('Failed to load quizzes')
       console.error('Load quizzes error:', error)
@@ -84,7 +84,7 @@ function ManageQuizzes() {
 
     // Filter by category
     if (categoryFilter !== 'all') {
-      filtered = filtered.filter(quiz => 
+      filtered = filtered.filter(quiz =>
         quiz.category_id === parseInt(categoryFilter)
       )
     }
@@ -102,7 +102,7 @@ function ManageQuizzes() {
         await adminService.publishQuiz(quizId)
         toast.success('Quiz published successfully')
       }
-      
+
       // Reload data
       loadData()
     } catch (error) {
@@ -115,7 +115,7 @@ function ManageQuizzes() {
     const confirmed = window.confirm(
       `Are you sure you want to delete "${quizTitle}"? This action cannot be undone.`
     )
-    
+
     if (!confirmed) return
 
     try {
@@ -156,9 +156,9 @@ function ManageQuizzes() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center space-x-4">
             <Button
               variant="ghost"
@@ -167,16 +167,19 @@ function ManageQuizzes() {
             >
               Back to Dashboard
             </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Manage Quizzes
-              </h1>
-              <p className="text-gray-600">
-                Create, edit, and manage all your quizzes
-              </p>
-            </div>
           </div>
-          
+
+        </div>
+
+        <div className='flex items-center justify-between mb-2'>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Manage Quizzes
+            </h1>
+            <p className="text-gray-600">
+              Create, edit, and manage all your quizzes
+            </p>
+          </div>
           <Button
             variant="primary"
             onClick={() => navigate('/admin/quiz/create')}
@@ -185,7 +188,6 @@ function ManageQuizzes() {
             Create New Quiz
           </Button>
         </div>
-
         {/* Filters */}
         <Card className="mb-6">
           <div className="flex flex-col sm:flex-row gap-4">
@@ -246,7 +248,7 @@ function ManageQuizzes() {
                 {quizzes.length === 0 ? 'No quizzes yet' : 'No quizzes match your filters'}
               </h3>
               <p className="text-gray-600 mb-6">
-                {quizzes.length === 0 
+                {quizzes.length === 0
                   ? 'Create your first quiz to get started'
                   : 'Try adjusting your search or filter criteria'
                 }
@@ -263,106 +265,105 @@ function ManageQuizzes() {
             </div>
           </Card>
         ) : (
-          <div className="space-y-4">
+          <div
+            className="
+    grid 
+    grid-cols-1 
+    sm:grid-cols-2 
+    lg:grid-cols-3 
+    xl:grid-cols-4 
+    gap-4
+  "
+          >
             {filteredQuizzes.map((quiz) => (
-              <Card key={quiz.id} className="hover:shadow-lg transition-shadow">
-                <div className="flex items-start justify-between">
-                  <div className="flex-grow">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            {quiz.title}
-                          </h3>
-                          {getStatusBadge(quiz.published)}
-                        </div>
-                        
-                        {quiz.description && (
-                          <p className="text-gray-600 text-sm mb-3">
-                            {quiz.description}
-                          </p>
-                        )}
+              <Card
+                key={quiz.id}
+                className="flex flex-col justify-between hover:shadow-lg transition-shadow"
+              >
+                {/* Body */}
+                <div className="p-4 flex-1">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {quiz.title}
+                    </h3>
+                    {getStatusBadge(quiz.published)}
+                  </div>
 
-                        {/* Category */}
-                        {quiz.category && (
-                          <span className="inline-block bg-primary-100 text-primary-800 text-xs font-medium px-2.5 py-0.5 rounded-full mb-3">
-                            {quiz.category.name}
-                          </span>
-                        )}
-                      </div>
-                    </div>
+                  {quiz.description && (
+                    <p className="text-gray-600 text-sm mb-3">
+                      {quiz.description}
+                    </p>
+                  )}
 
-                    {/* Stats */}
-                    <div className="flex items-center space-x-6 text-sm text-gray-600"></div>
+                  {quiz.category && (
+                    <span className="inline-block bg-primary-100 text-primary-800 text-xs font-medium px-2.5 py-0.5 rounded-full mb-3">
+                      {quiz.category.name}
+                    </span>
+                  )}
+
+                  <div className="text-sm text-gray-600 space-y-1">
                     <div className="flex items-center">
-                        <BookOpen className="w-4 h-4 mr-1" />
-                        {quiz._count?.questions || 0} questions
-                      </div>
-                      <div className="flex items-center">
-                        <Users className="w-4 h-4 mr-1" />
-                        {quiz._count?.results || 0} attempts
-                      </div>
-                      <div className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-1" />
-                        Created {formatDate(quiz.created_at)}
-                      </div>
+                      <BookOpen className="w-4 h-4 mr-1" />
+                      {quiz._count?.questions || 0} questions
+                    </div>
+                    <div className="flex items-center">
+                      <Users className="w-4 h-4 mr-1" />
+                      {quiz._count?.results || 0} attempts
+                    </div>
+                    <div className="flex items-center">
+                      <Calendar className="w-4 h-4 mr-1" />
+                      Created {formatDate(quiz.created_at)}
                     </div>
                   </div>
+                </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center space-x-2 ml-4">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => navigate(`/admin/quiz/${quiz.id}/edit`)}
-                      icon={Edit}
-                      title="Edit Quiz"
-                    >
-                      Edit
-                    </Button>
-                    
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => navigate(`/admin/quiz/${quiz.id}/results`)}
-                      icon={BarChart3}
-                      title="View Results"
-                    >
-                      Results
-                    </Button>
-
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => navigate(`/quiz/${quiz.id}`)}
-                      icon={Eye}
-                      title="Preview Quiz"
-                    >
-                      Preview
-                    </Button>
-
-                    <Button
-                      variant={quiz.published ? "outline" : "primary"}
-                      size="sm"
-                      onClick={() => handleTogglePublish(quiz.id, quiz.published)}
-                      icon={quiz.published ? XCircle : CheckCircle}
-                    >
-                      {quiz.published ? 'Unpublish' : 'Publish'}
-                    </Button>
-
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => handleDeleteQuiz(quiz.id, quiz.title)}
-                      icon={Trash2}
-                      title="Delete Quiz"
-                    >
-                      Delete
-                    </Button>
-                  </div>
+                {/* Footer (Actions) */}
+                <div className="p-4 border-t flex flex-wrap gap-2 justify-center">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate(`/admin/quiz/${quiz.id}/edit`)}
+                    icon={Edit}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate(`/admin/quiz/${quiz.id}/results`)}
+                    icon={BarChart3}
+                  >
+                    Results
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate(`/quiz/${quiz.id}`)}
+                    icon={Eye}
+                  >
+                    Preview
+                  </Button>
+                  <Button
+                    variant={quiz.published ? "outline" : "primary"}
+                    size="sm"
+                    onClick={() => handleTogglePublish(quiz.id, quiz.published)}
+                    icon={quiz.published ? XCircle : CheckCircle}
+                  >
+                    {quiz.published ? "Unpublish" : "Publish"}
+                  </Button>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleDeleteQuiz(quiz.id, quiz.title)}
+                    icon={Trash2}
+                  >
+                    Delete
+                  </Button>
+                </div>
               </Card>
             ))}
           </div>
+
         )}
       </div>
     </div>

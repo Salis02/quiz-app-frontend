@@ -1,8 +1,8 @@
-import { createContext, useContext, useReducer } from 'react'
-import { quizService } from '../services/quizService'
-import toast from 'react-hot-toast'
+import { createContext, useContext, useReducer, useCallback } from 'react';
+import { quizService } from '../services/quizService';
+import toast from 'react-hot-toast';
 
-const QuizContext = createContext(null)
+const QuizContext = createContext(null);
 
 // Quiz actions
 const QUIZ_ACTIONS = {
@@ -26,7 +26,7 @@ const QUIZ_ACTIONS = {
   
   RESET_QUIZ_STATE: 'RESET_QUIZ_STATE',
   SET_CURRENT_QUESTION: 'SET_CURRENT_QUESTION',
-}
+};
 
 // Initial state
 const initialState = {
@@ -46,7 +46,7 @@ const initialState = {
   // Loading states
   loading: false,
   submittingAnswer: false,
-}
+};
 
 // Reducer
 function quizReducer(state, action) {
@@ -55,26 +55,26 @@ function quizReducer(state, action) {
       return {
         ...state,
         loadingQuizzes: true,
-      }
+      };
 
     case QUIZ_ACTIONS.FETCH_QUIZZES_SUCCESS:
       return {
         ...state,
         quizzes: action.payload,
         loadingQuizzes: false,
-      }
+      };
 
     case QUIZ_ACTIONS.FETCH_QUIZZES_FAILURE:
       return {
         ...state,
         loadingQuizzes: false,
-      }
+      };
 
     case QUIZ_ACTIONS.START_QUIZ_START:
       return {
         ...state,
         loading: true,
-      }
+      };
 
     case QUIZ_ACTIONS.START_QUIZ_SUCCESS:
       return {
@@ -83,19 +83,19 @@ function quizReducer(state, action) {
         currentQuestion: 0,
         answers: {},
         loading: false,
-      }
+      };
 
     case QUIZ_ACTIONS.START_QUIZ_FAILURE:
       return {
         ...state,
         loading: false,
-      }
+      };
 
     case QUIZ_ACTIONS.SUBMIT_ANSWER_START:
       return {
         ...state,
         submittingAnswer: true,
-      }
+      };
 
     case QUIZ_ACTIONS.SUBMIT_ANSWER_SUCCESS:
       return {
@@ -106,22 +106,22 @@ function quizReducer(state, action) {
             optionId: action.payload.optionId,
             isCorrect: action.payload.isCorrect,
             submittedAt: action.payload.submittedAt,
-          }
+          },
         },
         submittingAnswer: false,
-      }
+      };
 
     case QUIZ_ACTIONS.SUBMIT_ANSWER_FAILURE:
       return {
         ...state,
         submittingAnswer: false,
-      }
+      };
 
     case QUIZ_ACTIONS.SET_CURRENT_QUESTION:
       return {
         ...state,
         currentQuestion: action.payload,
-      }
+      };
 
     case QUIZ_ACTIONS.FINISH_QUIZ_SUCCESS:
       return {
@@ -130,13 +130,13 @@ function quizReducer(state, action) {
         currentQuiz: null,
         currentQuestion: 0,
         answers: {},
-      }
+      };
 
     case QUIZ_ACTIONS.FETCH_RESULTS_SUCCESS:
       return {
         ...state,
         userResults: action.payload,
-      }
+      };
 
     case QUIZ_ACTIONS.RESET_QUIZ_STATE:
       return {
@@ -145,64 +145,53 @@ function quizReducer(state, action) {
         currentQuestion: 0,
         answers: {},
         quizResult: null,
-      }
+      };
 
     default:
-      return state
+      return state;
   }
 }
 
 // Context Provider
 export function QuizProvider({ children }) {
-  const [state, dispatch] = useReducer(quizReducer, initialState)
+  const [state, dispatch] = useReducer(quizReducer, initialState);
 
-  // Fetch public quizzes
-  const fetchQuizzes = async () => {
+  // Bungkus fungsi-fungsi dengan useCallback untuk menstabilkan pemanggilan
+  const fetchQuizzes = useCallback(async () => {
     try {
-      dispatch({ type: QUIZ_ACTIONS.FETCH_QUIZZES_START })
-      
-      const response = await quizService.getPublicQuizzes()
-      
+      dispatch({ type: QUIZ_ACTIONS.FETCH_QUIZZES_START });
+      const response = await quizService.getPublicQuizzes();
       dispatch({
         type: QUIZ_ACTIONS.FETCH_QUIZZES_SUCCESS,
-        payload: response.data
-      })
-      
+        payload: response.data,
+      });
     } catch (error) {
-      dispatch({ type: QUIZ_ACTIONS.FETCH_QUIZZES_FAILURE })
+      dispatch({ type: QUIZ_ACTIONS.FETCH_QUIZZES_FAILURE });
     }
-  }
+  }, [dispatch]);
 
-  // Start quiz
-  const startQuiz = async (quizId) => {
+  const startQuiz = useCallback(async (quizId) => {
     try {
-      dispatch({ type: QUIZ_ACTIONS.START_QUIZ_START })
-      
-      const response = await quizService.startQuiz(quizId)
-      
+      dispatch({ type: QUIZ_ACTIONS.START_QUIZ_START });
+      const response = await quizService.startQuiz(quizId);
       dispatch({
         type: QUIZ_ACTIONS.START_QUIZ_SUCCESS,
-        payload: response.data
-      })
-      
-      toast.success('Quiz started!')
-      return { success: true }
-      
+        payload: response.data,
+      });
+      toast.success('Quiz started!');
+      return { success: true };
     } catch (error) {
-      dispatch({ type: QUIZ_ACTIONS.START_QUIZ_FAILURE })
-      const message = error.response?.data?.message || 'Failed to start quiz'
-      toast.error(message)
-      return { success: false, message }
+      dispatch({ type: QUIZ_ACTIONS.START_QUIZ_FAILURE });
+      const message = error.response?.data?.message || 'Failed to start quiz';
+      toast.error(message);
+      return { success: false, message };
     }
-  }
+  }, [dispatch]);
 
-  // Submit answer
-  const submitAnswer = async (questionId, optionId) => {
+  const submitAnswer = useCallback(async (questionId, optionId) => {
     try {
-      dispatch({ type: QUIZ_ACTIONS.SUBMIT_ANSWER_START })
-      
-      const response = await quizService.submitAnswer(questionId, optionId)
-      
+      dispatch({ type: QUIZ_ACTIONS.SUBMIT_ANSWER_START });
+      const response = await quizService.submitAnswer(questionId, optionId);
       dispatch({
         type: QUIZ_ACTIONS.SUBMIT_ANSWER_SUCCESS,
         payload: {
@@ -210,110 +199,97 @@ export function QuizProvider({ children }) {
           optionId,
           isCorrect: response.data.is_correct,
           submittedAt: response.data.submitted_at,
-        }
-      })
-      
-      return { success: true, isCorrect: response.data.is_correct }
-      
+        },
+      });
+      return { success: true, isCorrect: response.data.is_correct };
     } catch (error) {
-      dispatch({ type: QUIZ_ACTIONS.SUBMIT_ANSWER_FAILURE })
-      const message = error.response?.data?.message || 'Failed to submit answer'
-      toast.error(message)
-      return { success: false, message }
+      dispatch({ type: QUIZ_ACTIONS.SUBMIT_ANSWER_FAILURE });
+      const message = error.response?.data?.message || 'Failed to submit answer';
+      toast.error(message);
+      return { success: false, message };
     }
-  }
+  }, [dispatch]);
 
-  // Finish quiz
-  const finishQuiz = async (quizId) => {
+  const finishQuiz = useCallback(async (quizId) => {
     try {
-      dispatch({ type: QUIZ_ACTIONS.FINISH_QUIZ_START })
-      
-      const response = await quizService.finishQuiz(quizId)
-      
+      dispatch({ type: QUIZ_ACTIONS.FINISH_QUIZ_START });
+      const response = await quizService.finishQuiz(quizId);
       dispatch({
         type: QUIZ_ACTIONS.FINISH_QUIZ_SUCCESS,
-        payload: response.data
-      })
-      
-      toast.success('Quiz completed!')
-      return { success: true, result: response.data }
-      
+        payload: response.data,
+      });
+      toast.success('Quiz completed!');
+      return { success: true, result: response.data };
     } catch (error) {
-      dispatch({ type: QUIZ_ACTIONS.FINISH_QUIZ_FAILURE })
-      const message = error.response?.data?.message || 'Failed to finish quiz'
-      toast.error(message)
-      return { success: false, message }
+      dispatch({ type: QUIZ_ACTIONS.FINISH_QUIZ_FAILURE });
+      const message = error.response?.data?.message || 'Failed to finish quiz';
+      toast.error(message);
+      return { success: false, message };
     }
-  }
+  }, [dispatch]);
 
-  // Fetch user results
-  const fetchUserResults = async () => {
+  const fetchUserResults = useCallback(async () => {
     try {
-      const response = await quizService.getUserResults()
-      
+      const response = await quizService.getUserResults();
       dispatch({
         type: QUIZ_ACTIONS.FETCH_RESULTS_SUCCESS,
-        payload: response.data
-      })
-      
+        payload: response.data,
+      });
     } catch (error) {
-      console.error('Failed to fetch results:', error)
+      console.error('Failed to fetch results:', error);
     }
-  }
+  }, [dispatch]);
 
-  // Navigate between questions
-  const nextQuestion = () => {
+  const nextQuestion = useCallback(() => {
     if (state.currentQuestion < state.currentQuiz.questions.length - 1) {
       dispatch({
         type: QUIZ_ACTIONS.SET_CURRENT_QUESTION,
-        payload: state.currentQuestion + 1
-      })
+        payload: state.currentQuestion + 1,
+      });
     }
-  }
+  }, [state.currentQuestion, state.currentQuiz]);
 
-  const previousQuestion = () => {
+  const previousQuestion = useCallback(() => {
     if (state.currentQuestion > 0) {
       dispatch({
         type: QUIZ_ACTIONS.SET_CURRENT_QUESTION,
-        payload: state.currentQuestion - 1
-      })
+        payload: state.currentQuestion - 1,
+      });
     }
-  }
+  }, [state.currentQuestion]);
 
-  const goToQuestion = (questionIndex) => {
+  const goToQuestion = useCallback((questionIndex) => {
     dispatch({
       type: QUIZ_ACTIONS.SET_CURRENT_QUESTION,
-      payload: questionIndex
-    })
-  }
+      payload: questionIndex,
+    });
+  }, [dispatch]);
 
-  // Reset quiz state
-  const resetQuizState = () => {
-    dispatch({ type: QUIZ_ACTIONS.RESET_QUIZ_STATE })
-  }
+  const resetQuizState = useCallback(() => {
+    dispatch({ type: QUIZ_ACTIONS.RESET_QUIZ_STATE });
+  }, [dispatch]);
 
   // Helper functions
   const getCurrentQuestion = () => {
-    if (!state.currentQuiz || !state.currentQuiz.questions) return null
-    return state.currentQuiz.questions[state.currentQuestion]
-  }
+    if (!state.currentQuiz || !state.currentQuiz.questions) return null;
+    return state.currentQuiz.questions[state.currentQuestion];
+  };
 
   const getAnsweredQuestionsCount = () => {
-    return Object.keys(state.answers).length
-  }
+    return Object.keys(state.answers).length;
+  };
 
   const isQuestionAnswered = (questionIndex) => {
-    const question = state.currentQuiz?.questions[questionIndex]
-    return question && state.answers[question.id]
-  }
+    const question = state.currentQuiz?.questions[questionIndex];
+    return question && state.answers[question.id];
+  };
 
   const canFinishQuiz = () => {
-    const totalQuestions = state.currentQuiz?.questions?.length || 0
-    const answeredQuestions = getAnsweredQuestionsCount()
-    return answeredQuestions === totalQuestions && answeredQuestions > 0
-  }
+    const totalQuestions = state.currentQuiz?.questions?.length || 0;
+    const answeredQuestions = getAnsweredQuestionsCount();
+    return answeredQuestions === totalQuestions && answeredQuestions > 0;
+  };
 
-  // Context value
   const value = {
     ...state,
     fetchQuizzes,
@@ -329,20 +305,20 @@ export function QuizProvider({ children }) {
     getAnsweredQuestionsCount,
     isQuestionAnswered,
     canFinishQuiz,
-  }
+  };
 
   return (
     <QuizContext.Provider value={value}>
       {children}
     </QuizContext.Provider>
-  )
+  );
 }
 
 // Custom hook
 export function useQuiz() {
-  const context = useContext(QuizContext)
+  const context = useContext(QuizContext);
   if (!context) {
-    throw new Error('useQuiz must be used within a QuizProvider')
+    throw new Error('useQuiz must be used within a QuizProvider');
   }
-  return context
+  return context;
 }

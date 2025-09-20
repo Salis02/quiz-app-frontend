@@ -24,6 +24,7 @@ import ResultsPage from './pages/user/ResultsPage'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import ManageQuizzes from './pages/admin/ManageQuizzes'
 import CreateQuiz from './pages/admin/CreateQuiz'
+import ManageCategories from './pages/admin/ManageCategories'
 
 function App() {
   return (
@@ -37,7 +38,7 @@ function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
-                
+
                 {/* Protected User Routes */}
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
@@ -59,7 +60,7 @@ function App() {
                     <ResultsPage />
                   </ProtectedRoute>
                 } />
-                
+
                 {/* Protected Admin Routes */}
                 <Route path="/admin" element={
                   <ProtectedRoute requireAdmin={true}>
@@ -76,11 +77,16 @@ function App() {
                     <CreateQuiz />
                   </ProtectedRoute>
                 } />
+                <Route path="/admin/categories" element={
+                  <ProtectedRoute requireAdmin={true}>
+                    <ManageCategories />
+                  </ProtectedRoute>
+                } />
               </Routes>
             </Layout>
-            
+
             {/* Toast notifications */}
-            <Toaster 
+            <Toaster
               position="top-right"
               toastOptions={{
                 duration: 3000,

@@ -37,7 +37,7 @@ function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white">
+      <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
@@ -65,7 +65,7 @@ function HomePage() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="bg-transparent border-white text-white hover:bg-white hover:text-primary-600"
+                    className="bg-transparent border-black text-primary-100 hover:bg-white hover:text-primary-600"
                     onClick={() => navigate('/results')}
                     icon={Trophy}
                   >
@@ -86,7 +86,7 @@ function HomePage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="bg-transparent border-white text-white hover:bg-white hover:text-primary-600"
+                  className="bg-transparent border-black text-primary-100 hover:bg-white hover:text-primary-600"
                   onClick={() => navigate('/login')}
                 >
                   Sign In
@@ -98,7 +98,7 @@ function HomePage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
